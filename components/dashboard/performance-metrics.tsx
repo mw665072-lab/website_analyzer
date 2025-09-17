@@ -19,32 +19,32 @@ function PerformanceScore({ score }: { score: number }) {
 }
 
 export function PerformanceMetrics({ analysis }: PerformanceMetricsProps) {
-  const { performance } = analysis
+  const { performance } = analysis || {}
 
   const performanceData = [
     {
       name: "Load Time",
-      value: Number.parseFloat(performance.loadTime),
+      value: Number.parseFloat(performance?.loadTime || 0),
       color: "hsl(var(--chart-1))",
       unit: "s",
     },
     {
       name: "FCP",
-      value: Number.parseFloat(performance.firstContentfulPaint),
+      value: Number.parseFloat(performance?.firstContentfulPaint || 0),
       color: "hsl(var(--chart-2))",
       unit: "s",
     },
     {
       name: "LCP",
-      value: Number.parseFloat(performance.largestContentfulPaint),
+      value: Number.parseFloat(performance?.largestContentfulPaint || 0),
       color: "hsl(var(--chart-3))",
       unit: "s",
     },
   ]
 
   const resourceData = [
-    { name: "Page Size", value: Number.parseInt(performance.responseSize), color: "hsl(var(--chart-1))" },
-    { name: "Requests", value: performance.requests, color: "hsl(var(--chart-2))" },
+    { name: "Page Size", value: Number.parseInt(performance?.responseSize || 0), color: "hsl(var(--chart-1))" },
+    { name: "Requests", value: performance?.requests || 0, color: "hsl(var(--chart-2))" },
   ]
 
   return (
@@ -55,16 +55,16 @@ export function PerformanceMetrics({ analysis }: PerformanceMetricsProps) {
             <Zap className="h-5 w-5" />
             Performance Metrics
           </div>
-          <PerformanceScore score={performance.score} />
+          <PerformanceScore score={performance?.score || 0} />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span>Performance Score</span>
-            <span className="font-medium">{performance.score}/100</span>
+            <span className="font-medium">{performance?.score || 0}/100</span>
           </div>
-          <Progress value={performance.score} className="h-2" />
+          <Progress value={performance?.score || 0} className="h-2" />
         </div>
 
         <div className="space-y-3">
@@ -87,7 +87,7 @@ export function PerformanceMetrics({ analysis }: PerformanceMetricsProps) {
               <Clock className="h-4 w-4" />
               Load Time
             </div>
-            <div className="text-2xl font-bold font-space-grotesk">{performance.loadTime}s</div>
+            <div className="text-2xl font-bold font-space-grotesk">{performance?.loadTime || 0}s</div>
           </div>
 
           <div className="space-y-2">
@@ -95,7 +95,7 @@ export function PerformanceMetrics({ analysis }: PerformanceMetricsProps) {
               <Download className="h-4 w-4" />
               Page Size
             </div>
-            <div className="text-2xl font-bold font-space-grotesk">{performance.responseSize}KB</div>
+            <div className="text-2xl font-bold font-space-grotesk">{performance?.responseSize || 0}KB</div>
           </div>
 
           <div className="space-y-2">
@@ -103,23 +103,23 @@ export function PerformanceMetrics({ analysis }: PerformanceMetricsProps) {
               <Activity className="h-4 w-4" />
               Requests
             </div>
-            <div className="text-2xl font-bold font-space-grotesk">{performance.requests}</div>
+            <div className="text-2xl font-bold font-space-grotesk">{performance?.requests || 0}</div>
           </div>
 
           <div className="space-y-2">
             <div className="text-sm text-muted-foreground">FCP</div>
-            <div className="text-2xl font-bold font-space-grotesk">{performance.firstContentfulPaint}s</div>
+            <div className="text-2xl font-bold font-space-grotesk">{performance?.firstContentfulPaint || 0}s</div>
           </div>
         </div>
 
         <div className="space-y-3 pt-2 border-t border-border/50">
           <div className="flex items-center justify-between text-sm">
             <span>First Contentful Paint</span>
-            <span className="font-medium">{performance.firstContentfulPaint}s</span>
+            <span className="font-medium">{performance?.firstContentfulPaint || 0}s</span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span>Largest Contentful Paint</span>
-            <span className="font-medium">{performance.largestContentfulPaint}s</span>
+            <span className="font-medium">{performance?.largestContentfulPaint || 0}s</span>
           </div>
         </div>
       </CardContent>

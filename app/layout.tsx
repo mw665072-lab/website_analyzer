@@ -1,10 +1,12 @@
+
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Space_Grotesk } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ErrorBoundary } from "@/components/error-boundary"
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
+import ReactQueryProvider from "@/components/react-query-provider"
 import "./globals.css"
 
 const inter = Inter({
@@ -26,19 +28,18 @@ export const metadata: Metadata = {
   keywords: ["SEO analysis", "website performance", "AI suggestions", "web analytics"],
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`font-sans ${inter.variable} ${spaceGrotesk.variable} antialiased`}>
         <ErrorBoundary>
           <Suspense fallback={null}>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-              {children}
-            </ThemeProvider>
+            <ReactQueryProvider>
+              <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+                {children}
+              </ThemeProvider>
+            </ReactQueryProvider>
           </Suspense>
         </ErrorBoundary>
         <Analytics />

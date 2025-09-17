@@ -23,30 +23,37 @@ interface AnalyticsOverviewProps {
 }
 
 export function AnalyticsOverview({ analysis }: AnalyticsOverviewProps) {
+  // Defensive: ensure analysis.performance and analysis.seo exist
+  const perf = analysis.performance || {};
+  const seo = analysis.seo || {};
+  const perfScore = typeof perf.score === "number" ? perf.score : 0;
+  const perfLoadTime = perf.loadTime ? Number.parseFloat(perf.loadTime) : 0;
+  const seoScore = typeof seo.score === "number" ? seo.score : 0;
+
   const performanceTrend = [
     { name: "Week 1", score: 65, loadTime: 3.2, seo: 72 },
     { name: "Week 2", score: 71, loadTime: 2.8, seo: 75 },
     { name: "Week 3", score: 68, loadTime: 3.1, seo: 78 },
     {
       name: "Week 4",
-      score: analysis.performance.score,
-      loadTime: Number.parseFloat(analysis.performance.loadTime),
-      seo: analysis.seo.score,
+      score: perfScore,
+      loadTime: perfLoadTime,
+      seo: seoScore,
     },
-  ]
+  ];
 
   const radarData = [
-    { subject: "SEO", score: analysis.seo.score, fullMark: 100 },
-    { subject: "Performance", score: analysis.performance.score, fullMark: 100 },
+    { subject: "SEO", score: seoScore, fullMark: 100 },
+    { subject: "Performance", score: perfScore, fullMark: 100 },
     { subject: "Accessibility", score: 85, fullMark: 100 },
     { subject: "Best Practices", score: 78, fullMark: 100 },
     { subject: "PWA", score: 45, fullMark: 100 },
-  ]
+  ];
 
-  const currentScore = analysis.performance.score
-  const previousScore = performanceTrend[performanceTrend.length - 2]?.score || 0
-  const scoreChange = currentScore - previousScore
-  const isImproving = scoreChange > 0
+  const currentScore = perfScore;
+  const previousScore = performanceTrend[performanceTrend.length - 2]?.score || 0;
+  const scoreChange = currentScore - previousScore;
+  const isImproving = scoreChange > 0;
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
