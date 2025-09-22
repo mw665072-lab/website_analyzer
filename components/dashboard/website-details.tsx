@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Globe, Calendar, Tag, Zap, FileText, Image as ImageIcon, Link, Code, FormInput, Type, Palette, Move, Maximize, Monitor, BarChart3 } from "lucide-react"
-import NextImage from "next/image"
 
 interface WebsiteOverviewProps {
     analysis: any

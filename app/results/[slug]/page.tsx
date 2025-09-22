@@ -4,20 +4,13 @@ import { notFound } from "next/navigation"
 import { LoadingDashboard } from "@/components/dashboard/loading-dashboard"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { WebsiteOverview } from "@/components/dashboard/website-overview"
-import { SeoAnalysis } from "@/components/dashboard/seo-analysis"
-import { PerformanceMetrics } from "@/components/dashboard/performance-metrics"
-import { AnalyticsOverview } from "@/components/dashboard/analytics-overview"
-import { BacklinkAnalysis } from "@/components/dashboard/backlink-analysis"
-import { BrandingInsights } from "@/components/dashboard/branding-insights"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AlertTriangle, CheckCircle, XCircle, Server, Shield, Smartphone } from "lucide-react"
-import { analyzeWebsite } from "@/lib/analyzeApi"
-import { TechnicalDetails } from "@/components/dashboard/technical-details"
-import { AccessibilityReport } from "@/components/dashboard/accessibility-report"
-import { ContentAnalysis } from "@/components/dashboard/content-analysis";
-import { MobileOptimizationReport } from "@/components/dashboard/mobile-optimization-report";
+import { analyzeWebsite, redirectCheck } from "@/lib/analyzeApi"
 import { WebsiteDetails } from "@/components/dashboard/website-details";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import RedirectChecker from "@/components/redirect-checker";
+import { SeoAnalyzer } from "@/components/seo-analyzer";
 
 interface PageProps {
   params: {
@@ -80,28 +73,46 @@ export default function ResultsPage({ params }: PageProps) {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  console.log("results",result)
+  console.log("results", result)
 
   useEffect(() => {
     const fetchAnalysis = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await analyzeWebsite({ url: decodeURIComponent(params.slug) });
-        setResult(data);
-        console.log(data);
+        const url = decodeURIComponent(params.slug);
+        
+        // Ensure URL has proper protocol
+        const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
+        
+        const data = await analyzeWebsite({ url: formattedUrl });
+        
+        // Validate response structure
+        if (data && data.result && data.result.website) {
+          setResult(data);
+        } else {
+          throw new Error("Invalid response structure");
+        }
       } catch (err) {
+        console.error("Analysis error:", err);
         setError("Failed to fetch analysis");
       } finally {
         setLoading(false);
       }
     };
-    fetchAnalysis();
+
+    // Add debounce to prevent multiple calls
+    const timer = setTimeout(() => {
+      fetchAnalysis();
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [params.slug]);
 
   if (loading) {
     return <LoadingDashboard />;
   }
+  
   if (error || !result) {
     notFound();
     return null;
@@ -114,71 +125,37 @@ export default function ResultsPage({ params }: PageProps) {
       <main className="container mx-auto px-4 py-8 space-y-8">
         <Suspense fallback={<LoadingDashboard />}>
           <WebsiteOverview analysis={result?.result?.website} />
-            <WebsiteDetails analysis={result?.result?.website} />
-          
-          {/* <AnalyticsOverview analysis={transformedData} />
-          
-          <div className="grid lg:grid-cols-2 gap-6">
-            <SeoAnalysis analysis={transformedData} />
-            <PerformanceMetrics analysis={transformedData} />
-          </div>
-          
-          <div className="grid lg:grid-cols-3 gap-6">
-            <TechnicalDetails technical={result.technical} />
-            <AccessibilityReport accessibility={result.accessibility} />
-            <ContentAnalysis content={result.content} />
-          </div>
-           */}
-          {/* <ScreenshotViewer screenshot={result.screenshot} /> */}
-{/*           
-          <SeoIssuesAndRecommendations seoAnalysis={result.seoAnalysis} />
-          
-          <MobileOptimizationReport mobileOptimization={result.mobileOptimization} />
-          
-          <BrandingInsights analysis={transformedData} />
-          
-          <BacklinkAnalysis backlinkAnalysis={result.backlinkAnalysis} /> */}
-          
-          {/* Performance Metrics Details */}
-          {/* <Card>
-            <CardHeader>
-              <CardTitle className="font-space-grotesk">Performance Metrics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-space-grotesk">{result.performanceMetrics?.totalAnalysisTime || 0}ms</div>
-                  <div className="text-sm text-muted-foreground">Total Analysis Time</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-space-grotesk">{result.performanceMetrics?.averageResponseTime || 0}ms</div>
-                  <div className="text-sm text-muted-foreground">Avg Response Time</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-space-grotesk">{result.performanceMetrics?.totalRequests || 0}</div>
-                  <div className="text-sm text-muted-foreground">Total Requests</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-space-grotesk">{result.performanceMetrics?.performanceScore || 0}</div>
-                  <div className="text-sm text-muted-foreground">Performance Score</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card> */}
-          
-          {/* Raw data display for debugging/completeness */}
-          {/* <details className="mt-8">
-            <summary className="cursor-pointer text-lg font-semibold mb-4 p-4 bg-muted rounded-lg hover:bg-muted/80 transition-colors">
-              Raw Analysis Data (Click to Expand)
-            </summary>
-            <div className="p-4 bg-muted rounded-lg">
-              <pre className="text-xs overflow-auto max-h-96">
-                {JSON.stringify(result, null, 2)}
-              </pre>
+
+          {/* Tabbar for different reports */}
+          <Tabs defaultValue="details" className="mt-6">
+            <TabsList className="w-full">
+              <TabsTrigger value="details">Website Details</TabsTrigger>
+              <TabsTrigger value="seo">Website SEO</TabsTrigger>
+              <TabsTrigger value="redirects">Redirect Checker</TabsTrigger>
+              <TabsTrigger value="issues">Website Issues</TabsTrigger>
+            </TabsList>
+
+            <div className="mt-4">
+              <TabsContent value="details">
+                <WebsiteDetails analysis={result?.result?.website} />
+              </TabsContent>
+
+              <TabsContent value="seo">
+                <SeoAnalyzer analysis={result?.seoResults?.seo?.data?.results} />
+              </TabsContent>
+
+              <TabsContent value="redirects">
+                <RedirectChecker result={result} />
+              </TabsContent>
+
+              <TabsContent value="issues">
+                <SeoIssuesAndRecommendations seoAnalysis={result?.result?.website?.seo || {}} />
+              </TabsContent>
             </div>
-          </details> */}
+          </Tabs>
         </Suspense>
       </main>
     </div>
   );
 }
+

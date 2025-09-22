@@ -17,3 +17,13 @@ export const analyzeWebsite = async (payload: AnalyzePayload) => {
   );
   return response.data;
 };
+
+export const redirectCheck = async (payload: { url: string }) => {
+  // Post to local redirect-check endpoint used by the developer environment
+  const response = await axios.post<AnalyzeResponse>(
+    "https://website-analyzer-backend-one.vercel.app/api/redirect-check",
+    payload,
+    { headers: { "Content-Type": "application/json" } }
+  );
+  return response.data;
+};
