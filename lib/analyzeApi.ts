@@ -5,6 +5,8 @@ export interface AnalyzePayload {
   options?: Record<string, any>;
 }
 
+const API_BASE_URL = "https://website-analyzer-backend-one.vercel.app/api";
+
 export interface AnalyzeResponse {
   // Define expected response shape here
   [key: string]: any;
@@ -12,7 +14,7 @@ export interface AnalyzeResponse {
 
 export const analyzeWebsite = async (payload: AnalyzePayload) => {
   const response = await axios.post<AnalyzeResponse>(
-    "http://localhost:7000/api/analyze",
+    `${API_BASE_URL}/analyze`,
     payload
   );
   return response.data;
@@ -21,7 +23,7 @@ export const analyzeWebsite = async (payload: AnalyzePayload) => {
 export const redirectCheck = async (payload: { url: string }) => {
   // Post to local redirect-check endpoint used by the developer environment
   const response = await axios.post<AnalyzeResponse>(
-    "http://localhost:7000/api/redirect-check",
+    `${API_BASE_URL}/redirect-check`,
     payload,
     { headers: { "Content-Type": "application/json" } }
   );
@@ -31,7 +33,7 @@ export const redirectCheck = async (payload: { url: string }) => {
 export const websiteSeo = async (payload: { url: string }) => {
   // Post to local website-seo endpoint used by the developer environment
   const response = await axios.post<AnalyzeResponse>(
-    "http://localhost:7000/api/website-seo",
+    `${API_BASE_URL}/seoWebsiteAnalyzer`,
     payload,
     { headers: { "Content-Type": "application/json" } }
   );
