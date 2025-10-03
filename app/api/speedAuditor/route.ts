@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { SEOAnalysisOrchestrator } from '@/lib/analyzeSeoWebsite';
 import { SpeedAuditor } from '@/lib/technical-seo-analyzer/speed-audit';
