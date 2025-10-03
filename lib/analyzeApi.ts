@@ -5,7 +5,9 @@ export interface AnalyzePayload {
   options?: Record<string, any>;
 }
 
-const API_BASE_URL = "https://website-analyzer-backend-one.vercel.app/api";
+// Use the Next.js internal API routes. A relative base ensures requests go
+// to this Next.js app's /api/* endpoints both in development and production.
+const API_BASE_URL = "/api";
 
 export interface AnalyzeResponse {
   // Define expected response shape here
@@ -39,4 +41,15 @@ export const websiteSeo = async (payload: { url: string }) => {
   );
   return response.data;
 };
+
+export const websiteSpeed = async (payload: { url: string }) => {
+  // Post to local website-speed endpoint used by the developer environment
+  const response = await axios.post<AnalyzeResponse>(
+    `${API_BASE_URL}/speedAuditor`,
+    payload,
+    { headers: { "Content-Type": "application/json" } }
+  );
+  return response.data;
+};
+
 

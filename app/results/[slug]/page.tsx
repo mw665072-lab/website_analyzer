@@ -1,11 +1,10 @@
 "use client";
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, useEffect, useRef, useState } from "react"
 import { notFound } from "next/navigation"
 import { LoadingDashboard } from "@/components/dashboard/loading-dashboard"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { WebsiteOverview } from "@/components/dashboard/website-overview"
-
-import { analyzeWebsite, websiteSeo } from "@/lib/analyzeApi"
+import { analyzeWebsite, websiteSeo, websiteSpeed } from "@/lib/analyzeApi"
 import { WebsiteDetails } from "@/components/dashboard/website-details";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import RedirectChecker from "@/components/redirect-checker";
@@ -30,12 +29,15 @@ export default function ResultsPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [websiteSeoData, setWebsiteSeoData] = useState<any>(null);
+  const [speedAnalyzer, setSpeedAnalyzer] = useState<any>(null);
+  const lastSeoCallRef = useRef<string | null>(null);
 
   const websiteSeoAnalyzer = async (url: string) => {
     try {
       const data = await websiteSeo({ url });
-      if (data && data.seoResults && data.seoResults) {
-        setWebsiteSeoData(data);
+      if (data?.results) {
+        setWebsiteSeoData(data?.results);
+        console.log("Website SEO data:", data);
       } else {
         throw new Error("Invalid response structure");
       }
@@ -45,7 +47,27 @@ export default function ResultsPage({ params }: PageProps) {
     }
   };
 
+  const websiteSpeedAnalyzer = async (url: string) => {
+    try {
+      const data = await websiteSpeed({ url });
+      if (data) {
+        setSpeedAnalyzer(data);
+        console.log("Website Speed data:", data);
+      } else {
+        throw new Error("Invalid response structure");
+      }
+    } catch (error) {
+      console.error("SEO analysis error:", error);
+      return null;
+    }
+  };
+
+
+
+
   useEffect(() => {
+    // avoid duplicate calls (React Strict Mode or remounts) by remembering last analyzed slug
+    const lastAnalyzedSlug = lastSeoCallRef.current;
     const fetchAnalysis = async () => {
       setLoading(true);
       setError(null);
@@ -53,15 +75,19 @@ export default function ResultsPage({ params }: PageProps) {
         const url = decodeURIComponent(params.slug);
         const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
         const data = await analyzeWebsite({ url: formattedUrl });
-        if (data && data.result && data.result.website) {
+        console.log("Analysis data:", data);
+        if (data) {
           setResult(data);
+          setLoading(false);
         } else {
           throw new Error("Invalid response structure");
         }
       } catch (err) {
         console.error("Analysis error:", err);
         setError("Failed to fetch analysis");
+        setResult(null);
       } finally {
+        // keep this finally in case something else needs it in future
         setLoading(false);
       }
     };
@@ -71,8 +97,18 @@ export default function ResultsPage({ params }: PageProps) {
       fetchAnalysis();
     }, 300);
 
-    websiteSeoAnalyzer(decodeURIComponent(params.slug));
+    const slugForSeo = decodeURIComponent(params.slug);
+    // Call websiteSeoAnalyzer only if we haven't already called it for this slug
+    if (lastAnalyzedSlug !== slugForSeo) {
+      lastSeoCallRef.current = slugForSeo;
+      websiteSeoAnalyzer(slugForSeo);
+    }
 
+    // Call websiteSpeedAnalyzer only if we haven't already called it for this slug
+    if (lastAnalyzedSlug !== slugForSeo) {
+      lastSeoCallRef.current = slugForSeo;
+      websiteSpeedAnalyzer(slugForSeo);
+    }
 
     return () => clearTimeout(timer);
   }, [params.slug]);
@@ -88,11 +124,11 @@ export default function ResultsPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader analysis={result?.result?.website} />
+      <DashboardHeader analysis={result} />
 
       <main className="container mx-auto px-4 py-8 space-y-8">
         <Suspense fallback={<LoadingDashboard />}>
-          <WebsiteOverview analysis={result?.result?.website} />
+          <WebsiteOverview analysis={result} />
 
           {/* Modern Enhanced Tabbar */}
           <div className="relative">
@@ -166,7 +202,7 @@ export default function ResultsPage({ params }: PageProps) {
                     <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Website Details</h3>
                     <ChevronRight className="w-4 h-4 text-blue-400" />
                   </div>
-                  <WebsiteDetails analysis={result?.result?.website} />
+                  <WebsiteDetails analysis={result} />
                 </TabsContent>
 
                 <TabsContent value="seo" className="m-0 rounded-xl bg-gradient-to-br from-green-50/30 to-emerald-50/30 dark:from-green-950/10 dark:to-emerald-950/10 border border-green-200/30 dark:border-green-800/30 p-6 transition-all duration-500 ease-out min-h-[140px]">
@@ -175,7 +211,9 @@ export default function ResultsPage({ params }: PageProps) {
                     <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">SEO Analysis</h3>
                     <ChevronRight className="w-4 h-4 text-green-400" />
                   </div>
-                  <SeoAnalyzer analysis={websiteSeoData?.seoResults?.seo?.data?.results} />
+                  <SeoAnalyzer analysis={websiteSeoData} 
+                    speedAnalysis={speedAnalyzer}
+                  />
                 </TabsContent>
 
                 <TabsContent value="redirects" className="m-0 rounded-xl bg-gradient-to-br from-purple-50/30 to-violet-50/30 dark:from-purple-950/10 dark:to-violet-950/10 border border-purple-200/30 dark:border-purple-800/30 p-6 transition-all duration-500 ease-out min-h-[140px]">

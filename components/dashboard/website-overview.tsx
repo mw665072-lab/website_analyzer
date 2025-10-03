@@ -8,7 +8,8 @@ interface WebsiteOverviewProps {
 }
 
 export function WebsiteOverview({ analysis }: WebsiteOverviewProps) {
-  if (!analysis) {
+  console.log("Rendering WebsiteOverview with analysis:", analysis);
+  if (!analysis?.url) {
     return (
       <Card className="animate-pulse">
         <CardHeader>

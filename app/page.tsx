@@ -6,7 +6,7 @@ import { Search, Zap, BarChart3, Palette, Shield, Clock, CheckCircle, Sparkles, 
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950 relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-[color:var(--color-background)] text-[color:var(--color-foreground)]">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -15,7 +15,7 @@ export default function HomePage() {
       </div>
 
       {/* Header */}
-      <header className="relative border-b border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50 transition-all duration-500">
+      <header className="relative border-b" style={{ borderColor: 'var(--color-border)' }}>
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer hover:scale-105 transition-all duration-300 group">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:shadow-blue-500/30 transition-all duration-300 relative overflow-hidden">
@@ -23,10 +23,24 @@ export default function HomePage() {
               <Globe className="h-4 w-4 text-white relative z-10 transition-transform duration-300 group-hover:rotate-12" />
             </div>
             <h1 className="text-xl font-bold font-space-grotesk bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-              AI Website Analyzer
+             Solution & Provider
             </h1>
           </div>
           <ThemeToggle />
+        </div>
+        <div className="bg-[color:var(--color-popover)] bg-opacity-80 dark:bg-opacity-80 backdrop-blur-xl sticky top-0 z-50 transition-all duration-500">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3 cursor-pointer hover:scale-105 transition-all duration-300 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:shadow-blue-500/30 transition-all duration-300 relative overflow-hidden">
+                <div className="absolute inset-0 bg-white/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <Globe className="h-4 w-4 text-white relative z-10 transition-transform duration-300 group-hover:rotate-12" />
+              </div>
+              <h1 className="text-xl font-bold font-space-grotesk bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+               Solution & Provider
+              </h1>
+            </div>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -157,7 +171,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative border-t border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl mt-20">
+      <footer className="relative border-t mt-20" style={{ borderColor: 'var(--color-border)' }}>
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3 cursor-pointer hover:scale-105 transition-all duration-300 group">
@@ -165,10 +179,25 @@ export default function HomePage() {
                 <Globe className="h-3 w-3 text-white" />
               </div>
               <span className="font-bold font-space-grotesk text-slate-900 dark:text-white group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
-                AI Website Analyzer
+               Solution & Provider
               </span>
             </div>
-            <p className="text-sm text-slate-600 dark:text-slate-400">© 2024 AI Website Analyzer. All rights reserved.</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">© 2024Solution & Provider. All rights reserved.</p>
+          </div>
+        </div>
+        <div className="bg-[color:var(--color-popover)] bg-opacity-80 dark:bg-opacity-80 backdrop-blur-xl">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3 cursor-pointer hover:scale-105 transition-all duration-300 group">
+                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+                  <Globe className="h-3 w-3 text-white" />
+                </div>
+                <span className="font-bold font-space-grotesk text-[color:var(--color-foreground)] group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+                Solution & Provider
+                </span>
+              </div>
+              <p className="text-sm text-[color:var(--color-muted-foreground)]">© 2024Solution & Provider. All rights reserved.</p>
+            </div>
           </div>
         </div>
       </footer>
